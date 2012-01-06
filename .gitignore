@@ -12,3 +12,4 @@ plasma_applet_tutorial1_automoc.cpp.files
 lib
 CMakeFiles
 CMakeTmp
+moc_framebookconfig.cpp
