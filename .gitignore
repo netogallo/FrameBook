@@ -1,0 +1,14 @@
+cmake_install.cmake
+cmake_uninstall.cmake
+CMakeCache.txt
+CTestTestfile.cmake
+framebook.moc
+install_manifest.txt
+Makefile
+moc_fbApi.cpp
+plasma_applet_framebook_automoc.cpp
+plasma_applet_framebook_automoc.cpp.files
+plasma_applet_tutorial1_automoc.cpp.files
+lib
+CMakeFiles
+CMakeTmp
