@@ -12,6 +12,9 @@
 #include <QFile>
 #include <KConfig>
 #include <KConfigGroup>
+#include <QWebPage>
+#include <QWebFrame>
+#include <QWebElement>
 
 FbApi::FbApi(QObject * parent):QObject(parent){
 
@@ -20,7 +23,39 @@ FbApi::FbApi(QObject * parent):QObject(parent){
   net=new QNetworkAccessManager(this);
   KConfigGroup imgConfig(&config,"Images");
   picList = new QList <QString> (imgConfig.readEntry("images",QList<QString>()));
+  user=new QString(imgConfig.readEntry("user",QString()));
+  pass=new QString(imgConfig.readEntry("pass",QString()));
+  page = new QWebPage(this);  
+  connect(page,SIGNAL(loadFinished(bool)),this,SLOT(doAuthentication(bool)));
+}
+
+void FbApi::authenticate(){
   
+  page->mainFrame()->load(QUrl(getLoginUrl()));
+}
+
+void FbApi::doAuthentication(bool stat){
+
+  qDebug() << page->mainFrame()->url();
+
+  QUrl url=QUrl(page->mainFrame()->url().toString().replace("#access_token","?access_token"));
+
+  if(url.hasQueryItem("access_token")){
+    qDebug() << "Yei: \n\n";
+    qDebug() << url.queryItemValue("access_token");
+    qDebug() << *pass;
+  
+    token=url.queryItemValue("access_token");    
+    getPicsId();
+  }
+  else if(url.hasQueryItem("login_attempt")){
+    qDebug()<<"Wrong user/password";
+  }
+  else{
+    page->mainFrame()->findFirstElement("input#email").setAttribute("value",*user);
+    page->mainFrame()->findFirstElement("input#pass").setAttribute("value",*pass);
+    page->mainFrame()->evaluateJavaScript("document.getElementById(\"login_form\").submit()");   
+  }
 }
 
 QUrl FbApi::getLoginUrl(){
@@ -34,6 +69,18 @@ void FbApi::getPicsId(){
   QString * url=new QString(getTagPics);
   resp=net->get(QNetworkRequest(QUrl(url->replace("ACCESS_TOKEN",token,Qt::CaseSensitive))));
   connect(resp,SIGNAL(finished()),this,SLOT(loadPicList()));
+}
+
+void FbApi::saveCredentials(QString myUser,QString myPass){
+
+  user=new QString(myUser);
+  pass=new QString(myPass);
+
+  KConfigGroup credentials(&config,"Images");
+  credentials.writeEntry("user",*user);
+  credentials.writeEntry("pass",*pass);
+  credentials.config()->sync();
+  
 }
 
 void FbApi::loadPicList(){
@@ -69,17 +116,20 @@ bool FbApi::nextPicture(){
 
 void FbApi::setPicture(){
   QString * path;
-  if(img){
-    path=new QString(QDir::tempPath().append("/framebook.jpg"));
-    img=false;
-  }else{
-    path=new QString(QDir::tempPath().append("/framebook2.jpg"));
-    img=true;
+
+  if(picResp->size()>1){
+    if(img){
+      path=new QString(QDir::tempPath().append("/framebook.jpg"));
+      img=false;
+    }else{
+      path=new QString(QDir::tempPath().append("/framebook2.jpg"));
+      img=true;
+    }
+    pic=new QFile(*path);
+    pic->open(QIODevice::WriteOnly);
+    pic->write(picResp->readAll());
+    pic->close();
+    emit picLoaded(path);
+    qDebug() << (*path);
   }
-  pic=new QFile(*path);
-  pic->open(QIODevice::WriteOnly);
-  pic->write(picResp->readAll());
-  pic->close();
-  emit picLoaded(path);
-  qDebug() << (*path);
 }

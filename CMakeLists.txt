@@ -15,7 +15,7 @@ include_directories(
    )
 
 # We add our source code here
-set(framebook_SRCS framebook.cpp fbApi.cpp)
+set(framebook_SRCS framebook.cpp fbApi.cpp framebookconfig.cpp framebookSettings.cpp)
 
 # Now make sure all files get to the right place
 kde4_add_plugin(plasma_applet_framebook ${framebook_SRCS})

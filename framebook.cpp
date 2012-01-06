@@ -18,6 +18,8 @@
 #include <QDebug>
 #include <QSizePolicy>
 #include <QTimer>
+#include <framebookconfig.h>
+//#include <framebookSettings.h>
  
 FrameBook::FrameBook(QObject *parent,const QVariantList &args)
   : Plasma::Applet(parent, args)
@@ -56,6 +58,7 @@ void FrameBook::init()
 
   setLayout(layout);
   nextImage();
+  api->authenticate();
 } 
 
 void FrameBook::nextImage(){
@@ -72,30 +75,19 @@ void FrameBook::setImage(QString * path){
 
 void FrameBook::createConfigurationInterface(KConfigDialog * parent){
 
-  fbAuth=new QWebView();
-  connect(fbAuth,SIGNAL(urlChanged(QUrl)),this,SLOT(onUrlChanged(QUrl)));
-  fbAuth->load(api->getLoginUrl());
-  parent->addPage(fbAuth, "Facebook Account");
+  //delete config;
+  settings = new FrameBookSettings();
+  config = new FrameBookConfig(parent);
+  config->setInstallURL(api->getLoginUrl().toString());
+  //config->setAttributes(*api->user,*api->pass);
+  connect(parent,SIGNAL(settingsChanged(QString)),this,SLOT(updateSettings(QString)));
+  parent->addPage(config,settings, "Facebook Account","Image");
 }
 
-void FrameBook::onUrlChanged(QUrl url){
-  
-  url=QUrl(url.toString().replace("#","?"));
-  printf(qPrintable(url.toString()));
+void FrameBook::updateSettings(QString dialog){
 
-  printf("\n\n");
-  if(url.hasQueryItem("access_token")){
-
-    printf("Yei: ");
-    printf(qPrintable(url.queryItemValue("access_token")));
-    api->token=url.queryItemValue("access_token");    
-    api->getPicsId();
-    
-  }else{
-    printf("Nay: ");
-    printf(qPrintable(url.queryItemValue("api_key")));
-  }
-	         
+  api->saveCredentials(config->getUser(),config->getPass());
+  api->authenticate();
 }
 
 // This is the command that links your applet to the .desktop file

@@ -14,6 +14,8 @@
 #include <kconfigdialog.h>
 #include <qjson/parser.h>
 #include <QTimer>
+#include <framebookconfig.h>
+#include <framebookSettings.h>
  
 class QSizeF;
  
@@ -29,22 +31,25 @@ class FrameBook : public Plasma::Applet
 
   public Q_SLOTS:
     void nextImage();
-    void onUrlChanged(QUrl url);
+    //void onUrlChanged(QUrl url);
     void setImage(QString * path);
+    void updateSettings(QString dialog);
 
  private:
   QGraphicsLinearLayout * layout;
+  FrameBookConfig * config;
   Plasma::Label * image;
   QHttp *http;
   QFile *tmpFile;
   QString tmpLoc;
   FbApi *api;
-  QWebView * fbAuth;
+  //QWebView * fbAuth;
   void createConfigurationInterface(KConfigDialog * parent);  
   QJson::Parser parser;
   Plasma::PushButton * nextBtn;
   QTimer * timer;
   int timeout;
+  FrameBookSettings *settings;
 };
  
 #endif
