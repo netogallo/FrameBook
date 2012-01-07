@@ -36,25 +36,27 @@ void FbApi::authenticate(){
 
 void FbApi::doAuthentication(bool stat){
 
-  qDebug() << page->mainFrame()->url();
+  if(stat){
+    qDebug() << page->mainFrame()->url();
 
-  QUrl url=QUrl(page->mainFrame()->url().toString().replace("#access_token","?access_token"));
+    QUrl url=QUrl(page->mainFrame()->url().toString().replace("#access_token","?access_token"));
 
-  if(url.hasQueryItem("access_token")){
-    qDebug() << "Yei: \n\n";
-    qDebug() << url.queryItemValue("access_token");
-    qDebug() << *pass;
+    if(url.hasQueryItem("access_token")){
+      qDebug() << "Yei: \n\n";
+      qDebug() << url.queryItemValue("access_token");
+      qDebug() << *pass;
   
-    token=url.queryItemValue("access_token");    
-    getPicsId();
-  }
-  else if(url.hasQueryItem("login_attempt")){
-    qDebug()<<"Wrong user/password";
-  }
-  else{
-    page->mainFrame()->findFirstElement("input#email").setAttribute("value",*user);
-    page->mainFrame()->findFirstElement("input#pass").setAttribute("value",*pass);
-    page->mainFrame()->evaluateJavaScript("document.getElementById(\"login_form\").submit()");   
+      token=url.queryItemValue("access_token");    
+      getPicsId();
+    }
+    else if(url.hasQueryItem("login_attempt")){
+      qDebug()<<"Wrong user/password";
+    }
+    else{
+      page->mainFrame()->findFirstElement("input#email").setAttribute("value",*user);
+      page->mainFrame()->findFirstElement("input#pass").setAttribute("value",*pass);
+      page->mainFrame()->evaluateJavaScript("document.getElementById(\"login_form\").submit()");   
+    }
   }
 }
 
