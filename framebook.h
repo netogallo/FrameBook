@@ -34,6 +34,7 @@ class FrameBook : public Plasma::Applet
     //void onUrlChanged(QUrl url);
     void setImage(QString * path);
     void updateSettings(QString dialog);
+    void setImgSize();
 
  private:
   QGraphicsLinearLayout * layout;

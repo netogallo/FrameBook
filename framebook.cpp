@@ -40,6 +40,8 @@ void FrameBook::init()
   api->id="317511414947451";  
   connect(api,SIGNAL(picsLoaded()),this,SLOT(nextImage()));
   connect(api,SIGNAL(picLoaded(QString*)),this,SLOT(setImage(QString*)));
+  connect(this,SIGNAL(geometryChanged()),this,SLOT(setImgSize()));
+  setImgSize();
   layout=new QGraphicsLinearLayout(Qt::Vertical,this);
 
   nextBtn = new Plasma::PushButton(this);
@@ -55,6 +57,7 @@ void FrameBook::init()
   
   layout->addItem(image);
   layout->addItem(nextBtn);
+  layout->setAlignment(image,Qt::AlignHCenter);
 
   setLayout(layout);
   nextImage();
@@ -70,7 +73,16 @@ void FrameBook::nextImage(){
 }
 
 void FrameBook::setImage(QString * path){
-    image->setImage(*path);
+  
+  qDebug() << size();
+  
+  image->setImage(*path);
+}
+
+void FrameBook::setImgSize(){
+
+  api->imgWidth=qRound(size().width());
+  api->imgHeight=qRound(size().height());
 }
 
 void FrameBook::createConfigurationInterface(KConfigDialog * parent){

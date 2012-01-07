@@ -15,6 +15,7 @@
 #include <QWebPage>
 #include <QWebFrame>
 #include <QWebElement>
+#include <Magick++.h> 
 
 FbApi::FbApi(QObject * parent):QObject(parent){
 
@@ -26,6 +27,8 @@ FbApi::FbApi(QObject * parent):QObject(parent){
   user=new QString(imgConfig.readEntry("user",QString()));
   pass=new QString(imgConfig.readEntry("pass",QString()));
   page = new QWebPage(this);  
+  imgWidth=320;
+  imgHeight=240;
   connect(page,SIGNAL(loadFinished(bool)),this,SLOT(doAuthentication(bool)));
 }
 
@@ -44,7 +47,7 @@ void FbApi::doAuthentication(bool stat){
     if(url.hasQueryItem("access_token")){
       qDebug() << "Yei: \n\n";
       qDebug() << url.queryItemValue("access_token");
-      qDebug() << *pass;
+      //qDebug() << *pass;
   
       token=url.queryItemValue("access_token");    
       getPicsId();
@@ -131,7 +134,14 @@ void FbApi::setPicture(){
     pic->open(QIODevice::WriteOnly);
     pic->write(picResp->readAll());
     pic->close();
+    Magick::Image image(qPrintable(*path));
+    //image.read(qPrintable(*path));
+    image.scale(Magick::Geometry(imgWidth,imgHeight,0,0));
+    //image.zoom("320x240");
+    image.write(qPrintable(path->replace(".jpg","r.jpg")));
+    //image.write("/home/neto/testjgp.jpg");
     emit picLoaded(path);
     qDebug() << (*path);
+    
   }
 }

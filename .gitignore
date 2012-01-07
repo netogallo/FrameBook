@@ -13,3 +13,5 @@ lib
 CMakeFiles
 CMakeTmp
 moc_framebookconfig.cpp
+*.pkg.tar.xz
+pkg/

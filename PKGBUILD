@@ -8,8 +8,8 @@ url="https://github.com/netogallo/FrameBook"
 license=('GPLv3')
 provides=('framebook')
 conflicts=('framebook')
-depends=('qjson')
-makedepends=()
+depends=('qjson','imagemagick','kdebase-plasma')
+makedepends=('qjson','imagemagick','kdebase-plasma')
 checkdepends=()
 optdepends=()
 source=()
@@ -17,14 +17,12 @@ noextract=()
 md5sums=() #generate with 'makepkg -g'
 
 build() { 
-	cd $srcdir/..
-	cp -r ./FrameBook $srcdir/framebook/	
-	cd $srcdir/framebook/
+	cd $srcdir/../
 	cmake -DCMAKE_INSTALL_PREFIX=/usr/ .
 	make 
 }
 
 package() {
-	cd $srcdir/framebook/
+	cd $srcdir/../
 	make DESTDIR=$pkgdir install
 }

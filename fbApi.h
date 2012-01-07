@@ -27,6 +27,8 @@ class FbApi : public QObject{
   QString * user;
   QString * pass;
   void saveCredentials(QString myUser,QString myPass);
+  int imgWidth;
+  int imgHeight;
  private:  
   QNetworkAccessManager * net;
   QNetworkReply * resp;
