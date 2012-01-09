@@ -2,11 +2,13 @@
 project(framebook)
 
 # Find the required Libaries
+
 find_package(KDE4 REQUIRED)
 include(KDE4Defaults)
 find_package(QJSON REQUIRED)
 find_package(ImageMagick COMPONENTS Magick++)
 
+set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  ${KDE4_ENABLE_EXCEPTIONS}")
 
 add_definitions (${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
 include_directories(

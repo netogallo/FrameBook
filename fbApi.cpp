@@ -15,7 +15,7 @@
 #include <QWebPage>
 #include <QWebFrame>
 #include <QWebElement>
-#include <Magick++.h> 
+#include <Magick++.h>
 
 FbApi::FbApi(QObject * parent):QObject(parent){
 
@@ -122,7 +122,7 @@ bool FbApi::nextPicture(){
 void FbApi::setPicture(){
   QString * path;
 
-  if(picResp->size()>1){
+  if(picResp->error()==QNetworkReply::NoError && picResp->size()>1){
     if(img){
       path=new QString(QDir::tempPath().append("/framebook.jpg"));
       img=false;
@@ -134,14 +134,17 @@ void FbApi::setPicture(){
     pic->open(QIODevice::WriteOnly);
     pic->write(picResp->readAll());
     pic->close();
-    Magick::Image image(qPrintable(*path));
-    //image.read(qPrintable(*path));
-    image.scale(Magick::Geometry(imgWidth,imgHeight,0,0));
-    //image.zoom("320x240");
-    image.write(qPrintable(path->replace(".jpg","r.jpg")));
-    //image.write("/home/neto/testjgp.jpg");
-    emit picLoaded(path);
-    qDebug() << (*path);
-    
+    try{
+      Magick::Image image(qPrintable(*path));
+      //image.read(qPrintable(*path));
+      image.scale(Magick::Geometry(imgWidth,imgHeight,0,0));
+      //image.zoom("320x240");
+      image.write(qPrintable(path->replace(".jpg","r.jpg")));
+      //image.write("/home/neto/testjgp.jpg");
+      emit picLoaded(path);
+      qDebug() << (*path);
+    }catch(Magick::Exception err){
+      qDebug() << "Error loading image, wait for next";
+    }    
   }
 }

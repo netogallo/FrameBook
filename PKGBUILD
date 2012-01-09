@@ -17,7 +17,7 @@ noextract=()
 md5sums=() #generate with 'makepkg -g'
 
 build() { 
-	cd $srcdir/../
+	cd $srcdir/../		
 	cmake -DCMAKE_INSTALL_PREFIX=/usr/ .
 	make 
 }
