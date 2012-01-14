@@ -90,22 +90,29 @@ void FbApi::saveCredentials(QString myUser,QString myPass){
 
 void FbApi::loadPicList(){
 
-  bool ok;
-  delete picList;
-  picList = new QList<QString> ();
+  bool ok;  
 
-  foreach(QVariant pic,(parser.parse(resp->readAll(), &ok).toMap()["data"].toList()))
-    (*picList).append(pic.toMap()["src_big"].toString());
-
-  qDebug() << (*picList);
-  KConfigGroup imgConfig(&config,"Images");
-  imgConfig.writeEntry("images",(*picList));
-  imgConfig.config()->sync();
+  QVariant result=parser.parse(resp->readAll(), &ok);
   resp->close();
-  delete resp;
+  //delete resp;
+
+  if(ok){
+    delete picList;
+    picList = new QList<QString> ();
+    
+
+    foreach(QVariant pic,result.toMap()["data"].toList())
+      (*picList).append(pic.toMap()["src_big"].toString());
+
+    qDebug() << (*picList);
+    KConfigGroup imgConfig(&config,"Images");
+    imgConfig.writeEntry("images",(*picList));
+    imgConfig.config()->sync();
+    emit picsLoaded();
+  }  
   //delete picList;
   //picList=&result["data"].toList();
-  emit picsLoaded();
+    
   
 }
 
